@@ -1,0 +1,36 @@
+*{
+    /* outline: 1px solid red; */
+}
+
+container{
+    display: grid;
+    margin: 50px 50px;
+    grid-template-columns: 20% 80%;
+}
+
+div{
+    display: inline-block;
+    position: relative;
+    vertical-align: top;
+    margin: 0px 50px;
+}
+
+textarea{
+    resize: none;
+}
+
+fieldset{
+    display: inline-block;
+}
+
+input{
+    display: inline-block
+}
+
+table{
+    width: 100%;
+}
+
+table, th, td{
+    border: 1px solid black;
+}

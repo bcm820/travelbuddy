@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<head>
+<meta charset=UTF-8>
+<title>Travel Buddy</title>
+{% load static %}
+<link rel="stylesheet" href="{% static 'travelbuddy/style.css' %}">
+</head>
+<body>
+<container>
+
+<div>
+    <h3>Hello, {{user.name}}!</h3>
+    <p><a href="add/">Add Travel Plan</a><br>
+    <a href=/logout/>Logout</a></p>
+
+    {% for message in messages %}
+    <p{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</p>
+    {% endfor %}
+
+</div>
+
+<div>
+    <h3>Your Trips</h3>
+    <table>
+    <tr>
+        <td>Destination</td>
+        <td>Start</td>
+        <td>End</td>
+        <td>Plan</td>
+    </tr>
+    {% for trip in user_trips %}
+    <tr>
+        <td><a href=trip/{{trip.id}}/>{{trip.destination}}</a></td>
+        <td>{{trip.start|date:"F j, Y"}}</td>
+        <td>{{trip.end|date:"F j, Y"}}</td>
+        <td>{{trip.plan}}</td>
+    </tr>
+    {% endfor %}
+    </table>
+
+    <h3>Other User's Travel Plans</h3>
+    <table>
+    <tr>
+        <td>Host</td>
+        <td>Destination</td>
+        <td>Start</td>
+        <td>End</td>
+        <td>Wanna Join?</td>
+    </tr>
+    {% for trip in other_trips %}
+    <tr>
+        <td>{{trip.host.name}}</td>
+        <td><a href=trip/{{trip.id}}/>{{trip.destination}}</a></td>
+        <td>{{trip.start|date:"F j, Y"}}</td>
+        <td>{{trip.end|date:"F j, Y"}}</td>
+        <td><a href="trip/{{trip.id}}/join">Join</a></td>
+    </tr>
+    {% endfor %}
+    </table>
+</div>
+
+</container>
+</body>
+</html>

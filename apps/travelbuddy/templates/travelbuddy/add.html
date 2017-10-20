@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<head>
+<meta charset=UTF-8>
+<title>Travel Buddy</title>
+{% load static %}
+<link rel="stylesheet" href="{% static 'travelbuddy/style.css' %}">
+</head>
+<body>
+<container>
+
+<div>
+    <h3>Add a Trip</h3>
+    <p>
+        <a href="../">Home</a><br>
+        <a href=/logout/>Logout</a>
+    </p>
+
+    {% for message in messages %}
+    <p{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</p>
+    {% endfor %}
+
+</div>
+
+<div>
+    <fieldset>
+    <form action=/travels/add/post/ method=post>
+        {% csrf_token %}
+        <p>Destination: <input type=text name=destination></p>
+        <p>Plan: <input type=text name=plan></p>
+        <p>Travel Date From: <input type=date name=start></p>
+        <p>Travel Date To: <input type=date name=end></p>
+        </p>
+        <p><input type="submit" value="Add"></p>
+    </form>
+    </fieldset>
+</div>
+
+</container>
+</body>
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<head>
+<meta charset=UTF-8>
+<title>Book Review</title>
+{% load static %}
+<link rel="stylesheet" href="{% static 'travelbuddy/style.css' %}">
+</head>
+<body>
+<container>
+
+<div>
+    <h3>Trip Info</h3>
+    <p>
+        <a href="../../">Home</a><br>
+        <a href=/logout/>Logout</a>
+    </p>
+
+    {% for message in messages %}
+    <p{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</p>
+    {% endfor %}
+
+</div>
+
+<div>
+    <h3>{{trip.destination}}</h3>
+    <p>Host: {{trip.host.name}}</p>
+    <p>Plan: {{trip.plan}}</p>
+    <p>Travel Date From: {{trip.start|date:"F j, Y"}}</p>
+    <p>Travel Date To: {{trip.end|date:"F j, Y"}}</p>
+    <hr>
+
+    <h3>Who Else is Going?</h3>
+    {% for user in users %}
+        {% if user != trip.host %}
+        <p>{{user.name}}</p>
+        {% endif %}
+    {% endfor %}
+</div>
+
+</container>
+</body>
+</html>

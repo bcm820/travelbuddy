@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
-from django.shortcuts import render, HttpResponse, redirect
-from django.contrib.messages import error
-from .models import *
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from models import *
 import bcrypt
 
 
@@ -21,11 +21,10 @@ def register(request):
     errors = User.objects.validate_registration(request.POST)
     if len(errors):
         for field, message in errors.iteritems():
-            error(request, message, extra_tags=field)
+            messages.error(request, message, extra_tags=field)
         return redirect('/')
 
-    else:
-        # If inputs valid, create new user
+    else: # If inputs valid, create new user
         User.objects.create(
             name = request.POST["name"],
             username = request.POST["username"],
@@ -49,11 +48,10 @@ def login(request):
     errors = User.objects.validate_login(request.POST)
     if len(errors):
         for field, message in errors.iteritems():
-            error(request, message, extra_tags=field)
+            messages.error(request, message, extra_tags=field)
         return redirect('/')
 
-    else:
-        # If inputs valid, store session for login and queries
+    else: # If inputs valid, store session for login and queries
         request.session['user'] = request.POST["username"]
         return redirect('/travels/')
 
@@ -61,7 +59,7 @@ def login(request):
 def logout(request):
     if 'user' in request.session:
         request.session.flush() # Deletes session data and cookie
-        error(request, "You have ended your session. Thank you!")
+        messages.error(request, "You have closed your session. Thank you!")
     return redirect('/')
 
 
@@ -71,7 +69,7 @@ def logout(request):
 # /travels/
 def main(request):
     if not 'user' in request.session: # Redirect logged out user
-        error(request, "You must login to view our site.")
+        messages.error(request, "You must login to view our site.")
         return redirect('/')
 
     user = User.objects.get(username=request.session['user'])
@@ -80,7 +78,7 @@ def main(request):
         # get user info
         "user": user,
         
-        # get trips lists
+        # get trip lists: one for user, another for user to join trips
         "user_trips": Trip.objects.filter(users=user),
         "other_trips": Trip.objects.exclude(users=user)
     }
@@ -89,25 +87,25 @@ def main(request):
 # /travels/add/
 def add(request):
     if not 'user' in request.session:
-        error(request, "You must login to view our site.")
+        messages.error(request, "You must login to view our site.")
         return redirect('/')
-
     return render(request, 'travelbuddy/add.html')
 
 # /travels/trip/<id>/
 def show(request, id):
     if not 'user' in request.session:
-        error(request, "You must login to view our site.")
+        messages.error(request, "You must login to view our site.")
         return redirect('/')
 
     data = {
-        # get trip info
+        # get individual trip info
         "trip": Trip.objects.get(id=id),
 
-        # get other users joining trip
+        # get other users joining the trip
         "users": Trip.objects.get(id=id).users.all().order_by()
     }
     return render(request, 'travelbuddy/show.html', data)
+
 
 
 ### User Actions ###
@@ -115,12 +113,12 @@ def show(request, id):
 # /travels/trip/<id>/join/
 def join(request, id):
     if not 'user' in request.session: # Redirect logged out user
-        error(request, "You must log back in to join another trip.")
+        messages.error(request, "You must log back in to join another trip.")
         return redirect('/')
 
+    # Add user in session to trip
     Trip.objects.get(id=id).users.add(
-            User.objects.get(username=request.session['user']))
-
+        User.objects.get(username=request.session['user']))
     return redirect('/travels/')
 
 # /travels/add/post/
@@ -130,14 +128,12 @@ def post(request):
     
     # validate and show errors
     errors = Trip.objects.validate(request.POST)
-
     if len(errors):
         for field, message in errors.iteritems():
-            error(request, message, extra_tags=field)
+            messages.error(request, message, extra_tags=field)
         return redirect('/travels/add/')
 
-    else:
-        # create new trip
+    else: # create new trip
         Trip.objects.create(
             destination = request.POST["destination"],
             plan = request.POST["plan"],
@@ -146,7 +142,7 @@ def post(request):
             host = User.objects.get(username=request.session['user'])
         )
 
+        # Add user in session to trip as one of the 'users'
         Trip.objects.last().users.add(
             User.objects.get(username=request.session['user']))
-
         return redirect('/travels/')

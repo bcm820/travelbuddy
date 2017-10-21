@@ -16,8 +16,8 @@
     <legend>Login</legend>
     <form action=/login/ method=post>
         {% csrf_token %}
-        <p>Username: <input type=text name=username></p>
-        <p>Password: <input type=password name=password></p>
+        <!-- "as_p" = paragraphs; also "as_table" and "as_ul" -->
+        {{ login.as_p }}
         <p><input type=submit value=Login></p>
     </form>
     </fieldset>
@@ -28,10 +28,7 @@
     <legend>Registration</legend>
     <form action=/register/ method=post>
         {% csrf_token %}
-        <p>Name: <input type=text name=name value={{request.session.name}}></p>
-        <p>Username: <input type=text name=username value={{request.session.username}}></p>
-        <p>Password: <input type="password" name="password"></p>
-        <p>Confirm Password: <input type="password" name="confirmation"></p>
+        {{ registration.as_p }}
         <p><input type="submit" value="Register"></p>
     </form>
     </fieldset>

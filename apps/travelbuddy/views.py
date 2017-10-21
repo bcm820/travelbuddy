@@ -4,15 +4,28 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from models import Trip
-import bcrypt
+from forms import RegisterForm, LoginForm
 
+
+
+
+# TO Implement:
+# - Django's class-based forms (with validation)
+# - Django's session approach
+# - Django's authentication model
+# - OAuth 2.0
 
 
 ### Login & Registration ###
 
 # /
 def index(request):
-    return render(request, 'travelbuddy/index.html')
+    # (auth) Include class RegisterForm in forms.py
+    forms = {
+        "registration": RegisterForm(),
+        "login": LoginForm()
+        }
+    return render(request, 'travelbuddy/index.html', forms)
 
 # /register/
 def register(request):
@@ -20,13 +33,16 @@ def register(request):
         return redirect('/')
 
     # (auth) Create new Django user
+    # .create_user() default params: username, email, and password
+    # for password, Django implements its own encryption
     user = User.objects.create_user(
         request.POST["username"],
         email = None,
         password = request.POST["password"] )
-        # Django implements its own encryption method
 
+    # additional parameter: 'name'
     user.name = request.POST["name"]
+
     # Store session for login and queries
     request.session['user'] = request.POST["username"]
     return redirect('/travels/')
@@ -34,13 +50,6 @@ def register(request):
 # /login/
 def login(request):
     if request.method == 'GET':
-        return redirect('/')
-
-    # Validate registration form and show errors
-    errors = User.objects.validate_login(request.POST)
-    if len(errors):
-        for field, message in errors.iteritems():
-            messages.error(request, message, extra_tags=field)
         return redirect('/')
 
     else: # If inputs valid, store session for login and queries

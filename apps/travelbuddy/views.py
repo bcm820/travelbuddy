@@ -1,8 +1,9 @@
 from __future__ import unicode_literals
 from django.shortcuts import render, redirect
 from django.contrib import messages
+from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from models import *
+from models import Trip
 import bcrypt
 
 
@@ -17,28 +18,18 @@ def index(request):
 def register(request):
     if request.method == 'GET': # Block GET requests
         return redirect('/')
-    
-    # Validate registration form and show errors
-    errors = User.objects.validate_registration(request.POST)
-    if len(errors):
-        for field, message in errors.iteritems():
-            messages.error(request, message, extra_tags=field)
-        return redirect('/')
 
-    else: # If inputs valid, create new user
-        User.objects.create(
-            name = request.POST["name"],
-            username = request.POST["username"],
+    # (auth) Create new Django user
+    user = User.objects.create_user(
+        request.POST["username"],
+        email = None,
+        password = request.POST["password"] )
+        # Django implements its own encryption method
 
-            # Encrypt user password and store in DB
-            password = bcrypt.hashpw(
-                request.POST["password"].encode(), bcrypt.gensalt()
-            )
-        )
-
-        # Store session for login and queries
-        request.session['user'] = request.POST["username"]
-        return redirect('/travels/')
+    user.name = request.POST["name"]
+    # Store session for login and queries
+    request.session['user'] = request.POST["username"]
+    return redirect('/travels/')
 
 # /login/
 def login(request):

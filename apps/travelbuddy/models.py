@@ -64,6 +64,9 @@ class User(models.Model):
     updated = models.DateTimeField(auto_now=True)
     objects = UserManager()
 
+    def __str__(self):
+        return '{} ({})'.format(self.name, self.username)
+
 class Trip(models.Model):
     destination = models.CharField(max_length=255)
     start = models.DateTimeField()
@@ -71,6 +74,20 @@ class Trip(models.Model):
     plan = models.TextField()
     added = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
-    host = models.ForeignKey(User, related_name="trip")
-    users = models.ManyToManyField(User, related_name="trips")
     objects = TripManager()
+
+    def __str__(self):
+        return '{}: {} - {} ({})'.format(
+            self.destination,
+            self.start.strftime('%m/%d'),
+            self.end.strftime('%m/%d'),
+            self.end.strftime('%Y'),
+            )
+
+    # Trip.objects.get(id=1).host gets the User hosting Trip1
+    # User.objects.get(id=1).hosting.all() gets the trips User1 will host
+    host = models.ForeignKey(User, related_name="hosting")
+
+    # Trip.objects.get(id=1).users.all() gets the users going on Trip1
+    # User.objects.get(id=1).going.all() gets the trips User1 is going on
+    users = models.ManyToManyField(User, related_name="going")

@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 from django.shortcuts import render, redirect
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from models import *
 import bcrypt
 
@@ -72,15 +73,16 @@ def main(request):
         messages.error(request, "You must login to view our site.")
         return redirect('/')
 
+    # Use username in session to query user info
     user = User.objects.get(username=request.session['user'])
     
     data = {
         # get user info
         "user": user,
-        
-        # get trip lists: one for user, another for user to join trips
-        "user_trips": Trip.objects.filter(users=user),
-        "other_trips": Trip.objects.exclude(users=user)
+
+        # get trip lists:
+        "user_trips": user.going.all(), # where user is going
+        "other_trips": Trip.objects.exclude(users=user) # not going
     }
     return render(request, 'travelbuddy/main.html', data)
 
@@ -101,8 +103,8 @@ def show(request, id):
         # get individual trip info
         "trip": Trip.objects.get(id=id),
 
-        # get other users joining the trip
-        "users": Trip.objects.get(id=id).users.all().order_by()
+        # get all users going (via template: IF user = host, exclude!)
+        "users": Trip.objects.get(id=id).users.all()
     }
     return render(request, 'travelbuddy/show.html', data)
 
@@ -143,6 +145,7 @@ def post(request):
         )
 
         # Add user in session to trip as one of the 'users'
+        # On the trip page, don't show on list via IF statement
         Trip.objects.last().users.add(
             User.objects.get(username=request.session['user']))
         return redirect('/travels/')

@@ -12,6 +12,7 @@ from forms import RegisterForm, LoginForm
 # TO Implement:
 # - Django's class-based forms (with validation)
 # - Django's session approach
+# - Django's user model
 # - Django's authentication model
 # - OAuth 2.0
 
@@ -27,34 +28,55 @@ def index(request):
         }
     return render(request, 'travelbuddy/index.html', forms)
 
+
 # /register/
 def register(request):
     if request.method == 'GET': # Block GET requests
         return redirect('/')
 
-    # (auth) Create new Django user
-    # .create_user() default params: username, email, and password
-    # for password, Django implements its own encryption
-    user = User.objects.create_user(
-        request.POST["username"],
-        email = None,
-        password = request.POST["password"] )
+    # (auth) Test post data against RegisterForm validations
+    form_post = RegisterForm(request.POST)
+    if not form_post.is_valid():
 
-    # additional parameter: 'name'
-    user.name = request.POST["name"]
+        # Flash error messages to page
+        for field, message in form_post.errors: # will this work?
+            messages.error(request, message, extra_tags=field)
+        return redirect('/')
 
-    # Store session for login and queries
-    request.session['user'] = request.POST["username"]
-    return redirect('/travels/')
+    else: # (auth) Create new user
+        # default params: username, email, and password
+        # for password, Django implements its own encryption
+        user = User.objects.create_user(
+            request.POST["username"],
+            email = None,
+            password = request.POST["password"] )
+
+        # additional param: 'name'
+        user.name = request.POST["name"]
+
+        # Store session for login and queries
+        request.session['user'] = request.POST["username"]
+        return redirect('/travels/')
+
 
 # /login/
 def login(request):
     if request.method == 'GET':
         return redirect('/')
 
+    # (auth) Test post data against RegisterForm validations
+    form_post = LoginForm(request.POST)
+    if not form_post.is_valid():
+
+        # Flash error messages to page
+        for field, message in form_post.errors: # will this work?
+            messages.error(request, message, extra_tags=field)
+        return redirect('/')
+
     else: # If inputs valid, store session for login and queries
         request.session['user'] = request.POST["username"]
         return redirect('/travels/')
+
 
 # /logout/
 def logout(request):
@@ -62,6 +84,7 @@ def logout(request):
         request.session.flush() # Deletes session data and cookie
         messages.error(request, "You have closed your session. Thank you!")
     return redirect('/')
+
 
 
 

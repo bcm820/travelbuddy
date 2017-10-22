@@ -1,12 +1,10 @@
 
 > **Currently working on new branch to:**
-> - Setup Django project to integrate multiple apps
 > - Implement Django's authentication and authorization system
-> - Use Django's form features
+> - Use Django's form and model features
 > - Implement OAuth 2.0
 
 
-Summary:
 --------
 **Plan & host a trip**: Set dates, list trip details, and create your own trip page for your friends to see.
 

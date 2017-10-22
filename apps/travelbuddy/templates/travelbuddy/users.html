@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<head>
+<meta charset=UTF-8>
+<title>Travel Buddy</title>
+{% load static %}
+<link rel="stylesheet" href="{% static 'travelbuddy/style.css' %}">
+</head>
+<body>
+<container>
+
+<div>
+    <h3>User List</h3>
+    <p><a href="/travels/">Home</a><br>
+    <a href="add/">Add Travel Plan</a><br>
+    <a href=/logout/>Logout</a></p>
+
+    {% for message in messages %}
+    <p{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</p>
+    {% endfor %}
+
+</div>
+
+<div>
+    <h3>Site Users</h3>
+    <table>
+    <tr>
+        <td>Name</td>
+        <td>Username</td>
+        <td>Member Since</td>
+    </tr>
+    {% for user in user_list %}
+    <tr>
+        <td>{{user.name}}</td>
+        <td>{{user.username}}</td>
+        <td>{{user.added}}</td>
+    </tr>
+    {% endfor %}
+    </table>
+
+</div>
+
+</container>
+</body>
+</html>

@@ -1,17 +1,39 @@
 from django import forms
+from django.core.exceptions import ValidationError
+from models import User, Trip
 
-class RegisterForm(forms.Form):
-    name = forms.CharField(min_length=3, max_length=45)
-    username = forms.CharField(min_length=3, max_length=45)
-    password = forms.CharField(max_length=100, widget=forms.PasswordInput)
-    password_confirmation = forms.CharField(max_length=100,widget=forms.PasswordInput)
+
+# Need to fix validations
+
+class RegisterForm(forms.ModelForm):
+    password = forms.CharField(widget=forms.PasswordInput())
+    confirm = forms.CharField(widget=forms.PasswordInput())
+
+    class Meta:
+        model = User
+        fields = '__all__'
+
+    def clean(self):
+        cleaned_data = super(RegisterForm, self).clean()
+        password = cleaned_data.get("password")
+        confirm = cleaned_data.get("confirmation")
+
+        if password != confirm:
+            raise ValidationError("Your password entries do not match!")
+
+
+# Need to fix validations
 
 class LoginForm(forms.Form):
     username = forms.CharField(max_length=45)
     password = forms.CharField(max_length=100, widget=forms.PasswordInput)
 
-class TripForm(forms.Form):
-    destination = forms.CharField(max_length=45)
-    start_date = forms.DateField(widget=forms.SelectDateWidget)
-    end_date = forms.DateField(widget=forms.SelectDateWidget)
-    plans = forms.CharField(max_length=100)
+
+
+# Need to validate for time
+
+class TripForm(forms.ModelForm):
+    class Meta:
+        model = Trip
+        fields = ['destination','start','end','plans']
+        exclude = ['added', 'updated','host','users']

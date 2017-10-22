@@ -11,6 +11,7 @@
 <div>
     <h3>Hello, {{user.username}}!</h3>
     <p><a href="add/">Add Travel Plan</a><br>
+    <a href="/travels/users/">Users</a><br>
     <a href=/logout/>Logout</a></p>
 
     {% for message in messages %}
@@ -33,7 +34,7 @@
         <td><a href=trip/{{trip.id}}/>{{trip.destination}}</a></td>
         <td>{{trip.start|date:"F j, Y"}}</td>
         <td>{{trip.end|date:"F j, Y"}}</td>
-        <td>{{trip.plan}}</td>
+        <td>{{trip.plans}}</td>
     </tr>
     {% endfor %}
     </table>

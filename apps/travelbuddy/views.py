@@ -1,17 +1,18 @@
 from __future__ import unicode_literals
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from models import Trip
-from forms import RegisterForm, LoginForm
+from django.views import generic
+from models import User, Trip
+from forms import RegisterForm, LoginForm, TripForm
+import bcrypt
 
 
 
 
 # TO Implement:
 # - Django's class-based forms (with validation)
-# - Django's session approach
+# - Django's session approach (login required)
 # - Django's user model
 # - Django's authentication model
 # - OAuth 2.0
@@ -21,7 +22,7 @@ from forms import RegisterForm, LoginForm
 
 # /
 def index(request):
-    # (auth) Include class RegisterForm in forms.py
+    # (auth) Include forms from forms.py
     forms = {
         "registration": RegisterForm(),
         "login": LoginForm()
@@ -35,24 +36,38 @@ def register(request):
         return redirect('/')
 
     # (auth) Test post data against RegisterForm validations
-    form_post = RegisterForm(request.POST)
-    if not form_post.is_valid():
+    post_data = RegisterForm(request.POST)
+    if not post_data.is_valid():
 
+        # NEED TO FIX FLASH INVALIDATIONS HERE
+
+        # messages.error(request, "You must log back in to join another trip.")
         # Flash error messages to page
-        for field, message in form_post.errors: # will this work?
-            messages.error(request, message, extra_tags=field)
+        # for field, message in post_data.errors: # will this work?
+        #     messages.error(request, message, extra_tags=field)
         return redirect('/')
 
-    else: # (auth) Create new user
+    else: # Create User -- stick with this or use Django's approach?
+        User.objects.create(
+            name = request.POST["name"],
+            username = request.POST["username"],
+
+            # Encrypt user password and store in DB
+            password = bcrypt.hashpw(
+                request.POST["password"].encode(), bcrypt.gensalt()
+            )
+        )
+
+        # (auth) Create new user
         # default params: username, email, and password
         # for password, Django implements its own encryption
-        user = User.objects.create_user(
-            request.POST["username"],
-            email = None,
-            password = request.POST["password"] )
+        # user = User.objects.create_user(
+        #     request.POST["username"],
+        #     email = None,
+        #     password = request.POST["password"] )
 
-        # additional param: 'name'
-        user.name = request.POST["name"]
+        # # additional param: 'name'
+        # user.name = request.POST["name"]
 
         # Store session for login and queries
         request.session['user'] = request.POST["username"]
@@ -65,12 +80,14 @@ def login(request):
         return redirect('/')
 
     # (auth) Test post data against RegisterForm validations
-    form_post = LoginForm(request.POST)
-    if not form_post.is_valid():
+    post_data = LoginForm(request.POST)
+    if not post_data.is_valid():
 
+        # NEED TO FIX FLASH INVALIDATIONS HERE
+        
         # Flash error messages to page
-        for field, message in form_post.errors: # will this work?
-            messages.error(request, message, extra_tags=field)
+        # for field, message in post_data.errors: # will this work?
+        #     messages.error(request, message, extra_tags=field)
         return redirect('/')
 
     else: # If inputs valid, store session for login and queries
@@ -82,7 +99,7 @@ def login(request):
 def logout(request):
     if 'user' in request.session:
         request.session.flush() # Deletes session data and cookie
-        messages.error(request, "You have closed your session. Thank you!")
+        messages.error(request, "You have ended your session. Thank you!")
     return redirect('/')
 
 
@@ -114,7 +131,8 @@ def add(request):
     if not 'user' in request.session:
         messages.error(request, "You must login to view our site.")
         return redirect('/')
-    return render(request, 'travelbuddy/add.html')
+    form = { "addtrip" : TripForm() }
+    return render(request, 'travelbuddy/add.html', form)
 
 # /travels/trip/<id>/
 def show(request, id):
@@ -130,6 +148,12 @@ def show(request, id):
         "users": Trip.objects.get(id=id).users.all()
     }
     return render(request, 'travelbuddy/show.html', data)
+
+# /travels/users/
+class UsersView(generic.ListView):
+    model = User
+    queryset = User.objects.all().order_by('name')
+    template_name = 'travelbuddy/users.html'
 
 
 

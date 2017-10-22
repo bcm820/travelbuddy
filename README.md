@@ -8,8 +8,8 @@
 
 Summary:
 --------
-**Plan and host a trip**: Organize your calendar, list trip details, and create your own unique trip page where others can view details about your trip.
+**Plan & host a trip**: Set dates, list trip details, and create your own trip page for your friends to see.
 
-**Join a trip**: Sign up to join a trip hosted by a friend on the site. You'll be added to their list automatically so you can plan trip details together.
+**Join a trip**: Sign up to join a trip hosted by a friend. Get added to their list automatically to plan details together.
 
-**Keep a Travelogue**: Keep a log of all your travels on your own unique user dashboard, and compare your list with other travelogues.
+**Keep a Travelogue**: Keep a log of all your travels on a unique user dashboard. Compare your list with other travelogues.

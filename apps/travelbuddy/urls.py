@@ -13,6 +13,7 @@ urlpatterns = [
     url(r'^travels/$', views.main),
     url(r'^travels/add/$', views.add),
     url(r'^travels/trip/(?P<id>\d+)/$', views.show),
+    url(r'^travels/users/$', views.UsersView.as_view()),
 
     # User Actions #
     url(r'^travels/add/post/$', views.post),

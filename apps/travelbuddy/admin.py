@@ -6,10 +6,18 @@ from models import User, Trip
 
 # Create admin classes
 class UserAdmin(admin.ModelAdmin):
-    pass
+    list_display = (
+        'name',
+        'username'
+    )
 
 class TripAdmin(admin.ModelAdmin):
-    pass
+    list_display = (
+        'destination',
+        'start',
+        'end',
+        'plans'
+    )
 
 # Create instances of admins
 admin.site.register(User, UserAdmin)
